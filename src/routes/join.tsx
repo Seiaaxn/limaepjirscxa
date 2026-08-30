@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import {
   MessageCircle,
   ShieldCheck,
@@ -10,8 +10,6 @@ import {
   ArrowRight,
   BadgeCheck,
   TrendingUp,
-  Activity,
-  Clock,
 } from "lucide-react";
 import {
   Accordion,
@@ -45,166 +43,6 @@ export const Route = createFileRoute("/join")({
 
 const reqIcons = [Users, Sparkles, ShieldCheck];
 const totalMembers = GEN_MEMBER_COUNTS.reduce((sum, g) => sum + g.count, 0);
-const TICKS = 12;
-
-/* ── Live motion hooks (pola yang sama dengan /system) ────────── */
-function useTicks(base: number, jitter: number, cap: number) {
-  const [values, setValues] = useState<number[]>(() => Array(TICKS).fill(base));
-  useEffect(() => {
-    const id = setInterval(() => {
-      setValues((prev) => {
-        const last = prev[prev.length - 1] ?? base;
-        const next = Math.max(
-          4,
-          Math.min(cap, last + (Math.random() - 0.45) * jitter * 2),
-        );
-        return [...prev.slice(1), Math.round(next)];
-      });
-    }, 1600);
-    return () => clearInterval(id);
-  }, [base, jitter, cap]);
-  return values;
-}
-
-function useSessionClock() {
-  const [sec, setSec] = useState(0);
-  useEffect(() => {
-    const origin = Date.now();
-    const id = setInterval(() => setSec(Math.floor((Date.now() - origin) / 1000)), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
-}
-
-function Sparkline({ values, color }: { values: number[]; color: string }) {
-  const W = 600,
-    H = 80,
-    MAX = 100;
-  const pts = values
-    .map((v, i) => `${(i / (values.length - 1)) * W},${H - (v / MAX) * H}`)
-    .join(" ");
-  const id = `join-${color.replace(/[^a-z0-9]/gi, "")}`;
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-20 w-full" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.22" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon points={`0,${H} ${pts} ${W},${H}`} fill={`url(#${id})`} />
-      <polyline
-        points={pts}
-        fill="none"
-        stroke={color}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{ transition: "all 700ms ease-out" }}
-      />
-    </svg>
-  );
-}
-
-function LivePanel() {
-  const activity = useTicks(38, 9, 92);
-  const slots = useTicks(64, 6, 96);
-  const clock = useSessionClock();
-  const activityPct = activity[activity.length - 1] ?? 0;
-  const slotsPct = slots[slots.length - 1] ?? 0;
-
-  return (
-    <section className="mx-auto mt-14 max-w-4xl">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="font-display text-2xl font-bold">Live Recruitment Metric</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Aktivitas pendaftaran & ketersediaan slot secara realtime
-          </p>
-        </div>
-        <span className="chip" style={{ color: "var(--accent-3)" }}>
-          <span
-            className="h-1.5 w-1.5 animate-pulse rounded-full"
-            style={{ background: "var(--accent-3)" }}
-          />
-          Live
-        </span>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        {[
-          {
-            icon: Activity,
-            title: "Recruitment Activity",
-            sub: "Estimasi lonjakan pendaftar per menit",
-            pct: activityPct,
-            values: activity,
-            color: "var(--accent-2)",
-          },
-          {
-            icon: Users,
-            title: "Slot Availability",
-            sub: "Kapasitas seleksi yang masih terbuka",
-            pct: slotsPct,
-            values: slots,
-            color: "var(--accent-3)",
-          },
-        ].map((p, i) => (
-          <div
-            key={p.title}
-            className="glass-card animate-rise p-6"
-            style={{ animationDelay: `${i * 110}ms` }}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl"
-                  style={{
-                    background: `color-mix(in oklab, ${p.color} 14%, white)`,
-                    color: p.color,
-                  }}
-                >
-                  <p.icon className="h-5 w-5" />
-                </span>
-                <div>
-                  <h3 className="font-semibold">{p.title}</h3>
-                  <p className="text-xs text-muted-foreground">{p.sub}</p>
-                </div>
-              </div>
-              <p className="font-display text-2xl font-bold tabular-nums" style={{ color: p.color }}>
-                {Math.round(p.pct)}%
-              </p>
-            </div>
-            <div className="mt-5 h-2 w-full overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full transition-all duration-700 ease-out"
-                style={{ width: `${p.pct}%`, background: p.color }}
-              />
-            </div>
-            <div className="mt-5 rounded-xl bg-secondary/50 p-2">
-              <Sparkline values={p.values} color={p.color} />
-            </div>
-            <p className="mt-2 text-right font-mono text-[0.65rem] tracking-wider text-muted-foreground uppercase">
-              {TICKS} tick · auto refresh
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="glass-card animate-rise mt-4 flex flex-wrap items-center justify-between gap-3 p-5">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          Sesi kamu berjalan
-        </span>
-        <span className="font-mono text-lg font-bold tabular-nums">{clock}</span>
-      </div>
-    </section>
-  );
-}
 
 function JoinPage() {
   const { t } = useI18n();
@@ -262,9 +100,6 @@ function JoinPage() {
           </span>
         </div>
       </section>
-
-      {/* ── Live metric (motion seperti /system) ───────────────── */}
-      <LivePanel />
 
       {/* ── Single selection path ──────────────────────────────── */}
       <section className="mx-auto mt-14 max-w-4xl">
