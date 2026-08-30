@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Zap, Clock, Server, Cpu, MemoryStick, Globe, HardDrive } from "lucide-react";
+import { Zap, Clock, Server, Cpu, MemoryStick, Globe, HardDrive, Activity, Users } from "lucide-react";
 import { BackButton } from "../components/BackButton";
-import { HeroBanner } from "../components/HeroBanner";
+import { getPersistedSessionStart } from "../lib/session";
 
 export const Route = createFileRoute("/system")({
   head: () => ({
@@ -66,7 +66,9 @@ function formatDuration(totalSeconds: number) {
 function useElapsedSeconds(initial = 0) {
   const [sec, setSec] = useState(initial);
   useEffect(() => {
-    const origin = Date.now() - initial * 1000;
+    // Origin diambil dari local storage agar uptime tidak reset tiap kali website dibuka
+    const origin = getPersistedSessionStart();
+    setSec(Math.floor((Date.now() - origin) / 1000));
     const id = setInterval(() => setSec(Math.floor((Date.now() - origin) / 1000)), 1000);
     return () => clearInterval(id);
   }, [initial]);
@@ -193,9 +195,13 @@ function SystemPage() {
   const ping = usePing();
   const cpuTicks = useTicks(22, 6, 55);
   const ramTicks = useTicks(8, 4, 22);
+  const recruitTicks = useTicks(38, 10, 92);
+  const slotTicks = useTicks(64, 15, 96);
 
   const cpuPct = cpuTicks[cpuTicks.length - 1];
   const ramPct = ramTicks[ramTicks.length - 1];
+  const recruitPct = recruitTicks[recruitTicks.length - 1];
+  const slotPct = slotTicks[slotTicks.length - 1];
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24">
@@ -225,13 +231,6 @@ function SystemPage() {
           </div>
           <StatusBadge ok={ping !== null} />
         </div>
-
-        {/* Banner 16:9 di dalam kartu hero */}
-        <HeroBanner
-          eyebrow="System Banner"
-          title="Five Fail Infrastructure"
-          subtitle="Visual identitas sistem Five Fail Family — dipantau realtime dari platform deploy."
-        />
       </div>
 
       {/* ── Platform info ──────────────────────────────────── */}
@@ -286,6 +285,58 @@ function SystemPage() {
           color="var(--accent-3)"
           note="Grafik simulasi klien (10 tick)"
         />
+      </div>
+
+      {/* ── Live Recruitment Metric (dipindahkan dari /join) ─── */}
+      <div className="mt-10">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-display text-2xl font-bold md:text-3xl">
+              Live Recruitment Metric
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Aktivitas pendaftaran & ketersediaan slot secara realtime
+            </p>
+          </div>
+          <span className="chip" style={{ color: "var(--accent-3)" }}>
+            <span
+              className="h-1.5 w-1.5 animate-pulse rounded-full"
+              style={{ background: "var(--accent-3)" }}
+            />
+            Live
+          </span>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2">
+          <GaugePanel
+            icon={Activity}
+            title="Recruitment Activity"
+            sub="Estimasi lonjakan pendaftar per menit"
+            percent={recruitPct}
+            values={recruitTicks}
+            color="var(--accent-2)"
+            note={`${TICKS} tick · auto refresh`}
+          />
+          <GaugePanel
+            icon={Users}
+            title="Slot Availability"
+            sub="Kapasitas seleksi yang masih terbuka"
+            percent={slotPct}
+            values={slotTicks}
+            color="var(--accent-3)"
+            note={`${TICKS} tick · auto refresh`}
+          />
+        </div>
+
+        <div className="glass-card mt-4 flex flex-wrap items-center justify-between gap-3 p-5">
+          <span className="inline-flex items-center gap-2 text-sm font-semibold">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            Sesi kamu berjalan
+          </span>
+          <span className="font-mono text-lg font-bold tabular-nums">
+            {formatDuration(appUptime)}
+          </span>
+        </div>
       </div>
 
       {/* ── Info box ───────────────────────────────────────── */}
