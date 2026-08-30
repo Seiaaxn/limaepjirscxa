@@ -13,9 +13,9 @@ import {
 import { img as resolveImg, onImgError } from "../lib/site-images";
 import { HashtagSection } from "../components/TikTokSections";
 import { AnimatedCounter } from "../components/AnimatedCounter";
-import { HeroBanner } from "../components/HeroBanner";
 import { GEN_MEMBER_COUNTS, GEN_FOLLOWER_REQUIREMENTS } from "../lib/site-config";
 import { useI18n } from "../lib/i18n";
+import { getPersistedSessionStart } from "../lib/session";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,7 +60,9 @@ function pad(n: number) {
 function useSessionUptime() {
   const [sec, setSec] = useState(0);
   useEffect(() => {
-    const origin = Date.now();
+    // Origin diambil dari local storage agar uptime tidak reset tiap reload
+    const origin = getPersistedSessionStart();
+    setSec(Math.floor((Date.now() - origin) / 1000));
     const id = setInterval(() => setSec(Math.floor((Date.now() - origin) / 1000)), 1000);
     return () => clearInterval(id);
   }, []);
@@ -241,13 +243,6 @@ function Index() {
             ))}
           </div>
         </div>
-
-        {/* Banner 16:9 di dalam kartu hero */}
-        <HeroBanner
-          eyebrow="Featured Banner"
-          title="Visual Identity 5F"
-          subtitle="Banner resmi Five Fail Family — identitas visual untuk semua member, editor & kreator."
-        />
       </section>
 
       {/* ── Overview metric ──────────────────────────────────── */}
