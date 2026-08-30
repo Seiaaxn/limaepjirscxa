@@ -1,0 +1,313 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Five Fail Family — Light / white theme (KyzzAPI-inspired).
+ * Off-white paper base, ink-black ink & CTA, soft neutral borders,
+ * mono micro-labels, subtle graph-paper backdrop.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Space Grotesk", "Archivo Black", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.875rem;
+
+  --shadow-sm: 0 1px 2px 0 rgba(15, 15, 15, 0.05);
+  --shadow-md: 0 6px 20px -10px rgba(15, 15, 15, 0.14);
+  --shadow-lg: 0 20px 48px -18px rgba(15, 15, 15, 0.22);
+
+  /* Paper base — putih, bukan hitam */
+  --background: oklch(0.985 0.002 95);
+  --foreground: oklch(0.18 0.004 90);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.004 90);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.004 90);
+
+  --primary: oklch(0.55 0.19 275);
+  --primary-foreground: oklch(0.99 0.005 275);
+
+  --secondary: oklch(0.965 0.003 95);
+  --secondary-foreground: oklch(0.24 0.004 90);
+
+  --muted: oklch(0.958 0.003 95);
+  --muted-foreground: oklch(0.53 0.006 90);
+
+  /* Accent = indigo lembut (tanpa hitam) */
+  --accent: oklch(0.55 0.19 275);
+  --accent-foreground: oklch(0.99 0.005 275);
+
+  --accent-2: oklch(0.58 0.2 305); /* violet */
+  --accent-2-foreground: oklch(0.99 0.005 305);
+  --accent-3: oklch(0.6 0.13 165); /* emerald */
+  --accent-3-foreground: oklch(0.99 0.005 165);
+  --accent-4: oklch(0.62 0.19 32); /* orange */
+  --accent-4-foreground: oklch(0.99 0.005 32);
+
+  --destructive: oklch(0.58 0.22 25);
+  --destructive-foreground: oklch(0.99 0.002 95);
+
+  --border: oklch(0.915 0.003 95);
+  --input: oklch(0.94 0.003 95);
+  --ring: oklch(0.78 0.004 90);
+
+  --grid-line: oklch(0.925 0.004 95);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv01";
+    background-image:
+      radial-gradient(ellipse 70% 40% at 50% -10%, oklch(from var(--color-accent) l c h / 0.07), transparent 70%),
+      radial-gradient(ellipse 45% 32% at 88% 12%, oklch(from var(--accent-3) l c h / 0.05), transparent 70%),
+      radial-gradient(ellipse 45% 32% at 8% 28%, oklch(from var(--accent-2) l c h / 0.05), transparent 70%),
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      56px 56px,
+      56px 56px;
+    background-attachment: fixed;
+  }
+  ::selection {
+    background: oklch(from var(--color-accent) l c h / 0.18);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ── Motion keyframes (dipakai di /system & /join) ───────────── */
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 oklch(from var(--color-accent) l c h / 0.28);
+  }
+  70% {
+    box-shadow: 0 0 0 10px oklch(from var(--color-accent) l c h / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 oklch(from var(--color-accent) l c h / 0);
+  }
+}
+
+@utility animate-rise {
+  animation: riseIn 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-float-soft {
+  animation: floatSoft 5.5s ease-in-out infinite;
+}
+
+@utility animate-pulse-ring {
+  animation: pulseRing 2.2s ease-out infinite;
+}
+
+@utility shimmer {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(1 0 0 / 0.75),
+      transparent
+    );
+    animation: shimmerSweep 2.4s ease-in-out infinite;
+  }
+}
+
+/* ── Reusable utilities ─────────────────────────────────────── */
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: var(--shadow-sm);
+}
+
+@utility glass-card {
+  position: relative;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-card-foreground);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+@utility glass-card-hover {
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: oklch(from var(--color-accent) l c h / 0.35);
+  }
+}
+
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+  cursor: pointer;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    opacity: 0.92;
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+  cursor: pointer;
+  &:hover {
+    background: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+@utility text-accent-soft {
+  color: var(--color-muted-foreground);
+  font-weight: 700;
+}
+
+@utility lego-stat {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: 0.85rem;
+  background: var(--color-secondary);
+}
